@@ -1,0 +1,68 @@
+---
+sudo: required
+dist: trusty
+
+services:
+  - docker
+
+before_install:
+  - sudo apt-get install -y curl
+
+script:
+  # Build docker image
+  - cd 5.4/
+  - docker build -t maestrano/elkx:travis . > /dev/null 2>&1
+
+  #=======================================
+  # Test with minimal parameters
+  #=======================================
+  - docker run -d -p 5601:5601 -p 9200:9200 -p 5044:5044 -p 12201:12201/udp --name travis-test maestrano/elkx:travis
+
+  # Get ip address
+  - "container_ip=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' travis-test`"
+
+  # Wait for container to be ready
+  - try_count=0;
+  - HEALTH_CHECK="starting"
+  - while [ "$HEALTH_CHECK" == "starting" ] || [ "$HEALTH_CHECK" == "unhealthy" ]; do let "try_count++"; [ $try_count -gt 100 ] && exit 20; sleep 5; HEALTH_CHECK=$(docker inspect --format='{{.State.Health.Status}}' travis-test 2>/dev/null); done
+
+  # Check that Kibana is up
+  - "curl http://${container_ip}:5061/"
+
+  # Check that Elasticsearch is up
+  - "curl --fail -u elastic:changeme http://${container_ip}:9200"
+
+  # Remove container
+  - docker rm -f travis-test
+
+  #=======================================
+  # Test with authentication
+  #=======================================
+  - docker run -d -p 5601:5601 -p 9200:9200 -p 5044:5044 -p 12201:12201/udp -e ES_PASSWORD=bl1bl1 -e KB_PASSWORD=bl2bl2 -e LS_PASSWORD=bl3bl3 --name travis-test maestrano/elkx:travis
+
+  # Get ip address
+  - "container_ip=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' travis-test`"
+
+  # Wait for container to be ready
+  - try_count=0;
+  - HEALTH_CHECK="starting"
+  - while [ "$HEALTH_CHECK" == "starting" ] || [ "$HEALTH_CHECK" == "unhealthy" ]; do let "try_count++"; [ $try_count -gt 100 ] && exit 20; sleep 5; HEALTH_CHECK=$(docker inspect --format='{{.State.Health.Status}}' travis-test 2>/dev/null); done
+
+  # Check that Kibana is up
+  - "curl http://${container_ip}:5061/"
+
+  # Check Elasticsearch authentication
+  - "curl --fail -u elastic:bl1bl1 http://${container_ip}:9200"
+  - "curl --fail -u kibana:bl2bl2 http://${container_ip}:9200"
+  - "curl --fail -u logstash_system:bl2bl2 http://${container_ip}:9200"
+
+  # Restart container
+  - docker restart travis-test
+
+  # Check Elasticsearch authentication again
+  - "curl --fail -u elastic:bl1bl1 http://${container_ip}:9200"
+  - "curl --fail -u kibana:bl2bl2 http://${container_ip}:9200"
+  - "curl --fail -u logstash_system:bl2bl2 http://${container_ip}:9200"
+
+  # Remove container
+  - docker rm -f travis-test
