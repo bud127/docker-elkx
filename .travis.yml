@@ -16,7 +16,7 @@ script:
   #=======================================
   # Test with minimal parameters
   #=======================================
-  - docker run -d -p 5601:5601 -p 9200:9200 -p 5044:5044 -p 12201:12201/udp --name travis-test maestrano/elkx:travis
+  - docker run -d -P --name travis-test maestrano/elkx:travis
 
   # Get ip address
   - "container_ip=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' travis-test`"
@@ -38,7 +38,7 @@ script:
   #=======================================
   # Test with authentication
   #=======================================
-  - docker run -d -p 5601:5601 -p 9200:9200 -p 5044:5044 -p 12201:12201/udp -e ES_PASSWORD=bl1bl1 -e KB_PASSWORD=bl2bl2 -e LS_PASSWORD=bl3bl3 --name travis-test maestrano/elkx:travis
+  - docker run -d -P -e ES_PASSWORD=bl1bl1 -e KB_PASSWORD=bl2bl2 -e LS_PASSWORD=bl3bl3 --name travis-test maestrano/elkx:travis
 
   # Get ip address
   - "container_ip=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' travis-test`"
