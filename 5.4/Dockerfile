@@ -150,4 +150,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 EXPOSE 5601 9200 9300 5044
 VOLUME /var/lib/elasticsearch
 
+COPY healthcheck.sh /usr/local/bin/
+HEALTHCHECK --timeout=5s CMD bash /usr/local/bin/healthcheck.sh
+
 CMD [ "/usr/local/bin/entrypoint.sh" ]
