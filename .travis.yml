@@ -33,6 +33,10 @@ script:
   # Check that Elasticsearch is up
   - "curl --fail -u elastic:changeme http://${container_ip}:9200"
 
+  # Check that Elasticsearch curator is properly setup
+  - "docker exec -it travis-test /usr/local/bin/curator --config /etc/elasticsearch/curator.yml /etc/elasticsearch/curator_action.yml"
+  - "docker exec -it travis-test /etc/cron.daily/cron/es_curator.sh"
+
   # Remove container
   - docker rm -f travis-test
 
@@ -69,6 +73,10 @@ script:
   - "curl --fail -u elastic:bl1bl1 http://${container_ip}:9200"
   - "curl --fail -u kibana:bl2bl2 http://${container_ip}:9200"
   - "curl --fail -u logstash_system:bl3bl3 http://${container_ip}:9200"
+
+  # Check that Elasticsearch curator is properly setup
+  - "docker exec -it travis-test /usr/local/bin/curator --config /etc/elasticsearch/curator.yml /etc/elasticsearch/curator_action.yml"
+  - "docker exec -it travis-test /etc/cron.daily/cron/es_curator.sh"
 
   # Remove container
   - docker rm -f travis-test

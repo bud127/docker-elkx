@@ -85,6 +85,12 @@ else
         && chmod +x /etc/init.d/elasticsearch
   fi
 
+  # Update curator configuration with ES password
+  if [ "$ES_PASSWORD" != "$ES_DEFAULT_PASSWD" ]; then
+    sed -i -e "s/^  http_auth:.*$/  http_auth: $ES_PASSWORD/" \
+      /etc/elasticsearch/curator.yml
+  fi
+
   service elasticsearch start
 
   # Wait for Elasticsearch to start up before either starting Kibana (if enabled)

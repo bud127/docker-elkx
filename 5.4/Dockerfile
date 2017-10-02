@@ -9,8 +9,9 @@ ENV ELK_VERSION 5.4.0
 ENV LOGSTASH_VERSION ${ELK_VERSION}
 ENV KIBANA_VERSION ${ELK_VERSION}
 ENV XPACK_VERSION ${ELK_VERSION}
+ENV ES_CURATOR_VERSION 5.2.0
 
-### Install prerequisites (cURL, gosu, JDK)
+### Install prerequisites (cURL, gosu, JDK, pip)
 ARG DEBIAN_FRONTEND=noninteractive
 RUN set -x \
  && apt-get update -qq \
@@ -25,7 +26,7 @@ RUN set -x \
  && chmod +x /usr/local/bin/gosu \
  && gosu nobody true \
  && apt-get update -qq \
- && apt-get install -qqy openjdk-8-jdk \
+ && apt-get install -qqy openjdk-8-jdk python-pip \
  && apt-get clean \
  && set +x
 
@@ -48,6 +49,9 @@ RUN mkdir ${ES_HOME} \
 COPY elasticsearch/elasticsearch.init /etc/init.d/elasticsearch
 RUN sed -i -e 's#^ES_HOME=$#ES_HOME='$ES_HOME'#' /etc/init.d/elasticsearch \
  && chmod +x /etc/init.d/elasticsearch
+
+### Install Elasticsearch Curator
+RUN pip install elasticsearch-curator==${ES_CURATOR_VERSION}
 
 ### Install Logstash
 ENV LOGSTASH_HOME /opt/logstash
@@ -110,6 +114,12 @@ COPY elasticsearch/log4j2.properties /etc/elasticsearch/log4j2.properties
 COPY elasticsearch/jvm.options /etc/elasticsearch/jvm.options
 COPY elasticsearch/elasticsearch.default /etc/default/elasticsearch
 RUN chmod -R +r /etc/elasticsearch
+
+### Elasticsearch Curator configuration
+COPY elasticsearch/curator.yml /etc/elasticsearch/curator.yml
+COPY elasticsearch/curator_action.yml /etc/elasticsearch/curator_action.yml
+COPY cron/es_curator.sh /etc/cron.daily/cron/es_curator.sh
+RUN chmod 775 /etc/cron.daily/cron/es_curator.sh
 
 ### Logstash configuration
 # certs/keys for Beats and Lumberjack input
