@@ -1,5 +1,7 @@
 # Elasticsearch, Logstash, Kibana, XPack (ELKX) Docker image
 
+[![Build Status](https://travis-ci.org/maestrano/docker-elkx.svg?branch=master)](https://travis-ci.org/maestrano/docker-elkx)
+
 This Docker image provides a convenient centralised log server and log management web interface, by packaging Elasticsearch, Logstash, Kibana and XPack (ELKX).
 
 Originally started from the excellent https://github.com/spujadas/elk-docker repo.
