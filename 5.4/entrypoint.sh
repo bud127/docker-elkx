@@ -87,7 +87,7 @@ else
 
   # Update curator configuration with ES password
   if [ "$ES_PASSWORD" != "$ES_DEFAULT_PASSWD" ]; then
-    sed -i -e "s/^  http_auth:.*$/  http_auth: $ES_PASSWORD/" \
+    sed -i -e "s/^  http_auth:.*$/  http_auth: elastic:$ES_PASSWORD/" \
       /etc/elasticsearch/curator.yml
   fi
 
