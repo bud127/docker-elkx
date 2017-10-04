@@ -118,8 +118,8 @@ RUN chmod -R +r /etc/elasticsearch
 ### Elasticsearch Curator configuration
 COPY elasticsearch/curator.yml /etc/elasticsearch/curator.yml
 COPY elasticsearch/curator_action.yml /etc/elasticsearch/curator_action.yml
-COPY cron/es_curator.sh /etc/cron.daily/cron/es_curator.sh
-RUN chmod 775 /etc/cron.daily/cron/es_curator.sh
+COPY cron/es_curator.sh /etc/cron.daily/es_curator.sh
+RUN chmod 775 /etc/cron.daily/es_curator.sh
 
 ### Logstash configuration
 # certs/keys for Beats and Lumberjack input

@@ -35,7 +35,7 @@ script:
 
   # Check that Elasticsearch curator is properly setup
   - "docker exec -it travis-test /usr/local/bin/curator --config /etc/elasticsearch/curator.yml /etc/elasticsearch/curator_action.yml"
-  - "docker exec -it travis-test /etc/cron.daily/cron/es_curator.sh"
+  - "docker exec -it travis-test /etc/cron.daily/es_curator.sh"
 
   # Remove container
   - docker rm -f travis-test
@@ -76,7 +76,7 @@ script:
 
   # Check that Elasticsearch curator is properly setup
   - "docker exec -it travis-test /usr/local/bin/curator --config /etc/elasticsearch/curator.yml /etc/elasticsearch/curator_action.yml"
-  - "docker exec -it travis-test /etc/cron.daily/cron/es_curator.sh"
+  - "docker exec -it travis-test /etc/cron.daily/es_curator.sh"
 
   # Remove container
   - docker rm -f travis-test
